@@ -47,9 +47,9 @@ function Counter({ end, suffix = '', duration = 2000 }) {
 }
 
 const stats = [
-  { end: 8, suffix: '+', label: 'Annual Events' },
-  { end: 7, suffix: '', label: 'Creative Circles' },
-  { end: 500, suffix: '+', label: 'Active Members' },
+  { end: 10, suffix: '+', label: 'Annual Events' },
+  { end: 5, suffix: '', label: 'Creative Circles' },
+  { end: 2500, suffix: '+', label: 'Active Members' },
   { end: 5, suffix: '+', label: 'Years of Excellence' },
 ];
 
