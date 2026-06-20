@@ -120,13 +120,19 @@ body {
     display: none !important;
   }
 
+  .glass {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
   a:active, button:active, [role="button"]:active {
     transform: scale(0.97);
     transition: transform 0.1s ease-out;
   }
 
   .glass:active {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.25);
   }
 }
