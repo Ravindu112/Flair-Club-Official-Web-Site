@@ -10,17 +10,23 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <img src="/images/logo.png" alt="Flair Club" className="h-10 w-10 rounded-full ring-2 ring-primary/50" />
+              <img src="/images/logo.webp" alt="Flair Club" className="h-10 w-10 rounded-full ring-2 ring-primary/50" loading="lazy" />
               <span className="text-xl font-heading font-bold gradient-text">Flair Club</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               The Entertainment & Aesthetic Club of the University of Sri Jayewardenepura. Where creativity meets passion.
             </p>
             <div className="flex gap-3">
-              {[Camera, MessageCircle, Video, AtSign].map((Icon, i) => (
+              {[
+                { icon: Camera, label: 'Photography' },
+                { icon: MessageCircle, label: 'Messaging' },
+                { icon: Video, label: 'Video' },
+                { icon: AtSign, label: 'Social Media' },
+              ].map(({ icon: Icon, label }) => (
                 <a
-                  key={i}
+                  key={label}
                   href="#"
+                  aria-label={label}
                   className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary/30 transition-all"
                 >
                   <Icon size={16} />

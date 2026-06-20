@@ -40,9 +40,10 @@ export default function About() {
               transition={{ duration: 0.6 }}
             >
               <img
-                src="/images/university-logo.png"
+                src="/images/university-logo.webp"
                 alt="University of Sri Jayewardenepura"
                 className="rounded-2xl w-full max-w-md mx-auto"
+                loading="lazy"
               />
             </motion.div>
             <motion.div
@@ -59,7 +60,7 @@ export default function About() {
                 From humble beginnings, Flair Club has grown into one of the most active and recognized societies on campus, known for organizing spectacular events, workshops, and competitions that engage the entire university community.
               </p>
               <div className="glass rounded-xl p-5 flex items-center gap-4">
-                <img src="/images/logo.png" alt="Flair Club" className="h-14 w-14 rounded-full ring-2 ring-primary/50" />
+                <img src="/images/logo.webp" alt="Flair Club" className="h-14 w-14 rounded-full ring-2 ring-primary/50" loading="lazy" />
                 <div>
                   <p className="text-white font-heading font-semibold">Advisor</p>
                   <p className="text-primary-light font-medium">Mrs. Chathurangani Thennakoon</p>

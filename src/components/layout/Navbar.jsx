@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
@@ -22,9 +22,14 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const prevLocRef = useRef(location);
+
   useEffect(() => {
-    setMobileOpen(false);
-    window.scrollTo(0, 0);
+    if (prevLocRef.current !== location) {
+      setMobileOpen(false);
+      window.scrollTo(0, 0);
+      prevLocRef.current = location;
+    }
   }, [location]);
 
   return (
@@ -37,7 +42,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
           <img
-            src="/images/logo.png"
+            src="/images/logo.webp"
             alt="Flair Club"
             className="h-10 w-10 rounded-full object-cover ring-2 ring-primary/50 group-hover:ring-primary transition-all"
           />
@@ -63,6 +68,7 @@ export default function Navbar() {
 
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
         >
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}

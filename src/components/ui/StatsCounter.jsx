@@ -1,10 +1,27 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
 
 function Counter({ end, suffix = '', duration = 2000 }) {
   const [count, setCount] = useState(0);
+  const [inView, setInView] = useState(false);
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!inView) return;
@@ -37,25 +54,42 @@ const stats = [
 ];
 
 export default function StatsCounter() {
+  const [inView, setInView] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="py-20 relative">
+    <section ref={ref} className="py-20 relative">
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5" />
       <div className="relative max-w-6xl mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="text-center"
+              className={`text-center transition-all duration-500 delay-${i * 100} ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
             >
               <Counter end={stat.end} suffix={stat.suffix} />
               <p className="text-gray-400 text-sm mt-2 font-medium uppercase tracking-wider">
                 {stat.label}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

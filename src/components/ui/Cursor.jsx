@@ -1,14 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Cursor() {
   const [pos, setPos] = useState({ x: -100, y: -100 });
   const [hovering, setHovering] = useState(false);
   const [visible, setVisible] = useState(false);
+  const visibleRef = useRef(visible);
+
+  useEffect(() => {
+    visibleRef.current = visible;
+  }, [visible]);
 
   useEffect(() => {
     const move = (e) => {
       setPos({ x: e.clientX, y: e.clientY });
-      if (!visible) setVisible(true);
+      if (!visibleRef.current) setVisible(true);
     };
     const leave = () => setVisible(false);
     const enter = () => setVisible(true);
