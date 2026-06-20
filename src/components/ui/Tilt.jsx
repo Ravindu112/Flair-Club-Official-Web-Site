@@ -1,12 +1,16 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
 
 export default function Tilt({ children, className = '', max = 8 }) {
   const ref = useRef(null);
 
-  const handleMouseMove = useCallback(
-    (e) => {
-      const el = ref.current;
-      if (!el) return;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const mq = window.matchMedia('(hover: none) and (pointer: coarse)');
+    if (mq.matches) return;
+
+    const handleMouseMove = (e) => {
       const rect = el.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -15,21 +19,24 @@ export default function Tilt({ children, className = '', max = 8 }) {
       const rotateX = ((y - centerY) / centerY) * -max;
       const rotateY = ((x - centerX) / centerX) * max;
       el.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-    },
-    [max],
-  );
+    };
 
-  const handleMouseLeave = useCallback(() => {
-    if (ref.current) {
-      ref.current.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-    }
-  }, []);
+    const handleMouseLeave = () => {
+      el.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    };
+
+    el.addEventListener('mousemove', handleMouseMove);
+    el.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      el.removeEventListener('mousemove', handleMouseMove);
+      el.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [max]);
 
   return (
     <div
       ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       className={className}
       style={{ transition: 'transform 0.15s ease-out', transformStyle: 'preserve-3d' }}
     >

@@ -4,13 +4,27 @@ export default function Cursor() {
   const [pos, setPos] = useState({ x: -100, y: -100 });
   const [hovering, setHovering] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [isTouch, setIsTouch] = useState(true);
   const visibleRef = useRef(visible);
+  const checkRef = useRef(false);
 
   useEffect(() => {
     visibleRef.current = visible;
   }, [visible]);
 
   useEffect(() => {
+    if (checkRef.current) return;
+    checkRef.current = true;
+    const mq = window.matchMedia('(hover: none) and (pointer: coarse)');
+    setIsTouch(mq.matches);
+    const handler = (e) => setIsTouch(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    if (isTouch) return;
+
     const move = (e) => {
       setPos({ x: e.clientX, y: e.clientY });
       if (!visibleRef.current) setVisible(true);
@@ -25,19 +39,15 @@ export default function Cursor() {
     document.addEventListener('mouseleave', leave);
     document.addEventListener('mouseenter', enter);
 
-    document.querySelectorAll('a, button, [role="button"], input, select, textarea').forEach((el) => {
-      el.addEventListener('mouseenter', addHover);
-      el.addEventListener('mouseleave', removeHover);
-    });
-
-    const observer = new MutationObserver(() => {
+    const apply = () => {
       document.querySelectorAll('a, button, [role="button"], input, select, textarea').forEach((el) => {
-        el.removeEventListener('mouseenter', addHover);
-        el.removeEventListener('mouseleave', removeHover);
         el.addEventListener('mouseenter', addHover);
         el.addEventListener('mouseleave', removeHover);
       });
-    });
+    };
+    apply();
+
+    const observer = new MutationObserver(apply);
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
@@ -46,11 +56,13 @@ export default function Cursor() {
       document.removeEventListener('mouseenter', enter);
       observer.disconnect();
     };
-  }, []);
+  }, [isTouch]);
+
+  if (isTouch) return null;
 
   return (
     <div
-      className="pointer-events-none fixed z-[9999] transition-opacity duration-300"
+      className="custom-cursor pointer-events-none fixed z-[9999] transition-opacity duration-300"
       style={{
         opacity: visible ? 1 : 0,
         left: pos.x,
