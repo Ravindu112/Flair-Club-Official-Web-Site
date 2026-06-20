@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
-import ScrollProgress from './components/ui/ScrollProgress';
 import Deferred from './components/ui/Deferred';
 
 const Cursor = lazy(() => import('./components/ui/Cursor'));
@@ -26,7 +25,6 @@ export default function App() {
       <Deferred>
         <Cursor />
       </Deferred>
-      <ScrollProgress />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route element={<Layout />}>
