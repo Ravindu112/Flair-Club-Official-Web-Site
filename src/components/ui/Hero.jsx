@@ -13,6 +13,10 @@ const taglines = [
 export default function Hero() {
   const [index, setIndex] = useState(0);
   const isMobile = useRef(false);
+  const gradientRef = useRef(null);
+  const tiltRef = useRef({ x: 0, y: 0 });
+  const frameRef = useRef(null);
+  const hasGyro = useRef(false);
 
   useEffect(() => {
     isMobile.current = window.innerWidth < 768;
@@ -23,10 +27,83 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (!isMobile.current) return;
+
+    const updateTilt = () => {
+      frameRef.current = null;
+      const { x, y } = tiltRef.current;
+      if (gradientRef.current) {
+        const gx = 50 + x * 40;
+        const gy = 50 + y * 40;
+        gradientRef.current.style.backgroundPosition = `${gx}% ${gy}%`;
+      }
+    };
+
+    const scheduleUpdate = () => {
+      if (!frameRef.current) {
+        frameRef.current = requestAnimationFrame(updateTilt);
+      }
+    };
+
+    const handleOrientation = (e) => {
+      const gamma = e.gamma || 0;
+      const beta = e.beta || 0;
+      tiltRef.current = {
+        x: Math.max(-1, Math.min(1, gamma / 45)),
+        y: Math.max(-1, Math.min(1, beta / 45)),
+      };
+      hasGyro.current = true;
+      scheduleUpdate();
+    };
+
+    const handleTouchMove = (e) => {
+      if (hasGyro.current) return;
+      const touch = e.touches[0];
+      const rect = gradientRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      tiltRef.current = {
+        x: ((touch.clientX - rect.left) / rect.width - 0.5) * 2,
+        y: ((touch.clientY - rect.top) / rect.height - 0.5) * 2,
+      };
+      scheduleUpdate();
+    };
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+    if (isIOS && typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission) {
+      DeviceOrientationEvent.requestPermission().then((state) => {
+        if (state === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+        } else {
+          window.addEventListener('touchmove', handleTouchMove, { passive: true });
+        }
+      });
+    } else {
+      window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+      window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    }
+
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      window.removeEventListener('deviceorientation', handleOrientation);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-dark via-dark-2 to-dark-3" />
+        <div
+          ref={gradientRef}
+          className="absolute inset-0 md:hidden transition-none pointer-events-none"
+          style={{
+            background: 'radial-gradient(600px circle at 50% 50%, rgba(233,30,99,0.12), rgba(63,81,181,0.08), transparent 70%)',
+            backgroundSize: '200% 200%',
+            willChange: 'background-position',
+          }}
+        />
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[60px] sm:blur-[120px] sm:animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary/20 rounded-full blur-[50px] sm:blur-[100px] sm:animate-pulse animation-delay-2000" />
         <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-accent/15 rounded-full blur-[40px] sm:blur-[80px] sm:animate-pulse animation-delay-4000" />
